@@ -35,6 +35,7 @@ data/
 .env
 .env.local
 .env.*.local
+.env.production
 
 # Cypress
 /cypress/videos/
