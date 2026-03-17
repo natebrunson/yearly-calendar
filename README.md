@@ -62,11 +62,18 @@ npm run dev:server   # Hono backend only (with file watching)
 
 The SQLite database is created automatically at `data/calendar.db` on first server start.
 
-## Production Build
+## Production
+
+Build the Vue frontend and start the server:
 
 ```sh
 npm run build
+npm start
 ```
+
+This runs everything on a single port (default 3001). The Hono server serves both the API and the built SPA. Set `PORT` in your `.env` to change it.
+
+Update `BETTER_AUTH_URL` in `.env` to match your production URL (e.g., `https://calendar.example.com`).
 
 ## Other Commands
 

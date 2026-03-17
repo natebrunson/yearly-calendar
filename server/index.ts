@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import './db' // Create tables before auth initializes
 import { auth } from './auth'
 import { events } from './events'
@@ -34,6 +35,13 @@ app.on(['POST', 'GET'], '/api/auth/*', (c) => {
 
 // Events API
 app.route('/api/events', events)
+
+// In production, serve the built Vue SPA
+if (process.env.NODE_ENV === 'production') {
+  app.use('*', serveStatic({ root: './dist' }))
+  // SPA fallback — serve index.html for any non-API, non-static routes
+  app.get('*', serveStatic({ root: './dist', path: 'index.html' }))
+}
 
 const port = parseInt(process.env.PORT || '3001')
 

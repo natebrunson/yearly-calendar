@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { format, parseISO, isSameDay } from 'date-fns'
+import { format, parseISO, isSameDay, isToday as isTodayFn } from 'date-fns'
 import type { CalendarEvent } from '@/types/database'
 
 const props = defineProps<{
@@ -24,6 +24,11 @@ const dayOfWeekAbbrev = computed(() => {
   if (!props.isValid) return ''
   const date = new Date(props.year, props.month, props.day)
   return format(date, 'EEE')
+})
+
+const isToday = computed(() => {
+  if (!props.isValid) return false
+  return isTodayFn(new Date(props.year, props.month, props.day))
 })
 
 // Sort events by order for consistent rendering
@@ -95,6 +100,9 @@ const cellStyle = computed(() => {
   if (props.isSelected) {
     return { backgroundColor: '#bfdbfe' } // blue-200
   }
+  if (isToday.value) {
+    return { backgroundColor: '#dcfce7' } // green-100
+  }
   if (props.isWeekend) {
     return { backgroundColor: props.weekendColor }
   }
@@ -123,6 +131,7 @@ const cellStyle = computed(() => {
           height: `${eventHeight}%`,
           borderRadius: getEventBorderRadius(getEventPosition(event)),
           margin: getEventMargin(getEventPosition(event)),
+          overflow: shouldShowLabel(event) ? 'visible' : undefined,
         }"
         @click.stop="emit('eventClick', event)"
         @mousedown.stop
@@ -189,7 +198,8 @@ const cellStyle = computed(() => {
 }
 
 .events-container {
-  @apply absolute inset-0 flex flex-col;
+  @apply absolute left-0 right-0 bottom-0 flex flex-col;
+  top: 16px;
   padding: 1px 0;
 }
 
@@ -204,8 +214,13 @@ const cellStyle = computed(() => {
 }
 
 .event-label {
-  @apply text-xs text-white font-medium truncate px-1;
+  @apply text-xs text-white font-medium px-1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: visible;
+  position: relative;
+  z-index: 5;
+  max-width: 600%; /* cap at ~6 cells wide */
 }
 </style>

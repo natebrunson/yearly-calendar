@@ -17,24 +17,31 @@ const emit = defineEmits<{
 const eventsStore = useEventsStore()
 
 // Form state
-const label = ref('')
+const label = ref('Work')
 const color = ref('#3b82f6')
 const saving = ref(false)
 const deleting = ref(false)
 
-// Preset colors
-const presetColors = [
-  '#ef4444', // red
-  '#f97316', // orange
-  '#eab308', // yellow
-  '#22c55e', // green
-  '#14b8a6', // teal
-  '#3b82f6', // blue
-  '#8b5cf6', // violet
-  '#ec4899', // pink
-  '#6b7280', // gray
-  '#000000', // black
+// Color presets with emoji labels
+const colorPresets = [
+  { color: '#ef4444', emoji: '❤️', label: 'Love' },
+  { color: '#f97316', emoji: '🏖️', label: 'Vacation' },
+  { color: '#eab308', emoji: '⭐', label: 'Important' },
+  { color: '#22c55e', emoji: '🏃', label: 'Fitness' },
+  { color: '#14b8a6', emoji: '🧘', label: 'Wellness' },
+  { color: '#3b82f6', emoji: '💼', label: 'Work' },
+  { color: '#8b5cf6', emoji: '🎉', label: 'Party' },
+  { color: '#ec4899', emoji: '🎂', label: 'Birthday' },
+  { color: '#6b7280', emoji: '📅', label: 'General' },
+  { color: '#000000', emoji: '🚫', label: 'Blocked' },
 ]
+
+function selectPreset(preset: typeof colorPresets[number]) {
+  color.value = preset.color
+  if (!label.value || colorPresets.some(p => p.label === label.value)) {
+    label.value = preset.label
+  }
+}
 
 const isEditing = computed(() => props.event !== null)
 
@@ -172,17 +179,20 @@ function handleBackdropClick(e: MouseEvent) {
 
           <!-- Color -->
           <div class="field">
-            <label class="field-label">Color</label>
+            <label class="field-label">Category</label>
             <div class="color-picker">
               <div class="preset-colors">
                 <button
-                  v-for="preset in presetColors"
-                  :key="preset"
+                  v-for="preset in colorPresets"
+                  :key="preset.color"
                   class="color-swatch"
-                  :class="{ 'color-swatch--selected': color === preset }"
-                  :style="{ backgroundColor: preset }"
-                  @click="color = preset"
-                />
+                  :class="{ 'color-swatch--selected': color === preset.color }"
+                  :style="{ backgroundColor: preset.color }"
+                  :title="preset.label"
+                  @click="selectPreset(preset)"
+                >
+                  <span class="swatch-emoji">{{ preset.emoji }}</span>
+                </button>
               </div>
               <div class="custom-color">
                 <input type="color" v-model="color" class="color-input" />
@@ -273,8 +283,14 @@ function handleBackdropClick(e: MouseEvent) {
 }
 
 .color-swatch {
-  @apply w-8 h-8 rounded-full border-2 border-transparent cursor-pointer
-         transition-transform hover:scale-110;
+  @apply w-9 h-9 rounded-full border-2 border-transparent cursor-pointer
+         transition-transform hover:scale-110 flex items-center justify-center;
+}
+
+.swatch-emoji {
+  font-size: 14px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
 .color-swatch--selected {
