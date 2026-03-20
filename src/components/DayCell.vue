@@ -126,6 +126,7 @@ const cellStyle = computed(() => {
         v-for="event in sortedEvents"
         :key="event.id"
         class="event-bar"
+        :class="{ 'event-bar--single': getEventPosition(event) === 'single' }"
         :style="{
           backgroundColor: event.color,
           height: `${eventHeight}%`,
@@ -204,13 +205,25 @@ const cellStyle = computed(() => {
 }
 
 .event-bar {
-  @apply flex items-center cursor-pointer transition-opacity;
+  @apply flex items-start cursor-pointer transition-opacity;
   min-height: 0;
+  padding: 5px 2px;
   flex: 1;
 }
 
 .event-bar:hover {
   @apply opacity-80;
+}
+
+.event-bar--single {
+  overflow: hidden !important;
+}
+
+.event-bar--single .event-label {
+  white-space: normal;
+  word-break: break-word;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .event-label {
